@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 @WebServlet("*.file")
@@ -38,22 +39,23 @@ public class FileController extends HttpServlet {
                 int maxFileSize = 1024 * 1024 * 10;
                 MultipartRequest multi = new MultipartRequest(req,uploadPath,maxFileSize,"utf8",new DefaultFileRenamePolicy());
 
-                int board_seq = Integer.parseInt(multi.getParameter("message"));
-                String origin_name  = multi.getOriginalFileName("file");
-                String sys_name  = multi.getFilesystemName("file");
-
-                System.out.println(board_seq);
-
-                UploadDTO dto = new UploadDTO(0,origin_name,sys_name,159);
-
-                int result = dao.uploadFile(dto);
-                if(result>0){
-                    System.out.println("정상 입력");
-                }else{
-                    System.out.println("업로드 실패");
+                Enumeration<String> names = multi.getFileNames();
+                while(names.hasMoreElements()){
+                    String filename = names.nextElement();
+                    System.out.println(filename);
+                    if(multi.getFile(filename) != null){
+                        String origin_name  = multi.getOriginalFileName(filename);
+                        String sys_name  = multi.getFilesystemName(filename);
+                        UploadDTO dto = new UploadDTO(0,origin_name,sys_name,159);
+                        int result = dao.uploadFile(dto);
+                        if(result>0){
+                            System.out.println("정상 입력");
+                        }else{
+                            System.out.println("업로드 실패");
+                        }
+                    }
                 }
                 res.sendRedirect("/index.jsp");
-
             }else if(cmd.equals("/download.file")){
 
             }else if(cmd.equals("/list.file")){
