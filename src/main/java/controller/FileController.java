@@ -6,14 +6,12 @@ import dao.UploadDAO;
 import dto.UploadDTO;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -58,6 +56,9 @@ public class FileController extends HttpServlet {
                 }
                 res.sendRedirect("/index.jsp");
             }else if(cmd.equals("/download.file")){
+
+                //여기서 자유롭게 권한부여, 로그기록 등의 코드를 구현해도 됨.
+
                 String sys_name = req.getParameter("sysname");
                 String origin_name = req.getParameter("originname");
                 String path = req.getServletContext().getRealPath("files");
@@ -66,9 +67,18 @@ public class FileController extends HttpServlet {
 
                 //제어문으로 브라우저마다 인코딩 방식을 지정해줘야함.
                 origin_name = new String(origin_name.getBytes("utf8"), "ISO-8859-1");
-                //해당 방식은 크롬에서 사용하는 인코딩 방식임.
-
                 res.setHeader("Content-Disposition","attachment; filename="+origin_name);
+                //해당 방식은 크롬에서 사용하는 인코딩 방식임.
+                File target = new File(path+"\\"+sys_name);
+                byte[] targetContents = new byte[(int)target.length()];
+                try(
+                        DataInputStream dis = new DataInputStream(new FileInputStream(target));
+                        ServletOutputStream sos = res.getOutputStream();
+                    ){
+                    dis.readFully(targetContents); //클라이언트가 선택한 서버에 저장된 파일을 전부 서버 램에 복사
+                    sos.write(targetContents);
+                    sos.flush();
+                }
 
             }else if(cmd.equals("/list.file")){
                 List<UploadDTO> data = dao.selectAll();
