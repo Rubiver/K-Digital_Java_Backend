@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -57,6 +58,17 @@ public class FileController extends HttpServlet {
                 }
                 res.sendRedirect("/index.jsp");
             }else if(cmd.equals("/download.file")){
+                String sys_name = req.getParameter("sysname");
+                String origin_name = req.getParameter("originname");
+                String path = req.getServletContext().getRealPath("files");
+                System.out.println(path+"\\"+sys_name);
+                System.out.println(origin_name);
+
+                //제어문으로 브라우저마다 인코딩 방식을 지정해줘야함.
+                origin_name = new String(origin_name.getBytes("utf8"), "ISO-8859-1");
+                //해당 방식은 크롬에서 사용하는 인코딩 방식임.
+
+                res.setHeader("Content-Disposition","attachment; filename="+origin_name);
 
             }else if(cmd.equals("/list.file")){
                 List<UploadDTO> data = dao.selectAll();

@@ -24,9 +24,12 @@
             File list
         </legend>
         <c:forEach var="file" items="${data}" varStatus="status">
-            ${file.seq}  /  <a href="/files/${file.sys_name}">${file.origin_name}</a>  /  ${file.sys_name}  /  ${file.board_seq} <br>
+<%--            ${file.seq}  /  <a href="/files/${file.sys_name}">${file.origin_name}</a>  /  ${file.sys_name}  /  ${file.board_seq} <br>--%>
+            ${file.seq}  /  <a href="/download.file?sysname=${file.sys_name}&originname=${file.origin_name}">${file.origin_name}</a>  /  ${file.sys_name}  /  ${file.board_seq} <br>
         </c:forEach>
     </fieldset>
+<%--    다운로드를 파일에 대한 다이렉트 링크 처리 시 코드구현이 매우 쉽지만 다운로드 권한 통제, 로그기록, 다운로드 시 브라우저ㅓ 액션 처리가 불가--%>
+<%--    다운로드를 컨트롤러를 거쳐 처리할 경우 권한통제, 로그기록, 다운로드 액션처리가 가능하지만 코드 구현이 어려움.--%>
     <button type="button" id="load">파일 목록 불러오기</button>
 </form>
 <script>
